@@ -29,9 +29,9 @@ import au.edu.unsw.sltf.services.impl.ImportDownloadFaultDocumentImpl;
         /**
          * Auto generated method signature
          * 
-                                     * @param importMarketData0 
-             * @return importMarketDataResponse1 
-             * @throws ImportDownloadFaultException 
+         * @param importMarketData0 
+         * @return importMarketDataResponse1 
+         * @throws ImportDownloadFaultException 
          */
         
     	public au.edu.unsw.sltf.services.ImportMarketDataResponseDocument importMarketData
@@ -43,18 +43,23 @@ import au.edu.unsw.sltf.services.impl.ImportDownloadFaultDocumentImpl;
                 String sec = req.getSec();
                 Calendar start = req.getStartDate();
                 Calendar end = req.getEndDate();
+                
+                String outputFile = System.getProperty("catalina.home") + "//" + "output.csv";
                 try {
 					URL dataSource = new URL(req.getDataSourceURL());
 					/* If input is validated, then download the file */
 					CsvDownloader dl = new CsvDownloader(dataSource);
 					dl.downloadCsv();
+					/* Read the newly downloaded file*/
 					String filepath = System.getProperty("java.io.tmpdir") + "//" + dataSource.getFile();
 					CsvReader reader = new CsvReader(filepath);
+					/* Read the first line of the csv file, should be the commented line*/
 					if(! reader.initialiseReader()) {
 						//TODO throw ImportDownloadFaultException program
 					}
-					String outputFile = System.getProperty("catalina.home") + "//" + "output.csv";
+					/* Create output file */
 					CsvWriter writer = new CsvWriter(outputFile);
+					/* Iterate over the MarketData */
 					MarketData data = reader.getMarketDataRow();
 					while (data != null) {
 						if (isValidData(data,sec,start,end)) {
@@ -65,7 +70,6 @@ import au.edu.unsw.sltf.services.impl.ImportDownloadFaultDocumentImpl;
 					writer.closeFile();
 					
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					// TODO throw ImportDownloadFaultException
 					ImportDownloadFaultException faultExcep = new ImportDownloadFaultException ();
@@ -74,15 +78,13 @@ import au.edu.unsw.sltf.services.impl.ImportDownloadFaultDocumentImpl;
 					
 					//ImportDownloadFaultType faultType = ImportDownloadFaultType.Factory.newInstance(ImportDownloadFaultType.Enum.INT_INVALID_URL,null);
 					
-				}
-                
-                
-                
-                
-                
+				}  
+                              
 
                 ImportMarketDataResponseDocument resDoc = ImportMarketDataResponseDocument.Factory.newInstance();
                 ImportMarketDataResponse res = resDoc.addNewImportMarketDataResponse();
+                // Give the output file path as the eventSetId
+                res.setEventSetId(outputFile);
 //                res.setReturn(returnStr);
 
                 return resDoc;
@@ -92,9 +94,9 @@ import au.edu.unsw.sltf.services.impl.ImportDownloadFaultDocumentImpl;
         /**
          * Auto generated method signature
          * 
-                                     * @param downloadFile2 
-             * @return downloadFileResponse3 
-             * @throws ImportDownloadFaultException 
+         * @param downloadFile2 
+         * @return downloadFileResponse3 
+         * @throws ImportDownloadFaultException 
          */
         
          public au.edu.unsw.sltf.services.DownloadFileResponseDocument downloadFile
@@ -119,6 +121,12 @@ import au.edu.unsw.sltf.services.impl.ImportDownloadFaultDocumentImpl;
         	 return isValid;
          }
          
+         /**
+          * Check if the dates are valid. (i.e the end date is after the start date).
+          * @param start
+          * @param end
+          * @return
+          */
          private boolean isValidDates (Calendar start, Calendar end) {
         	 boolean isValid = true;
         	 if(start.after(end) || start.equals(end)) isValid = false;
@@ -126,6 +134,11 @@ import au.edu.unsw.sltf.services.impl.ImportDownloadFaultDocumentImpl;
         	 return isValid;
          }
          
+         /**
+          * Check that the Security Code is valid.
+          * @param sec
+          * @return
+          */
          private boolean isValidSec (String sec) {
         	 boolean isValid = true;
         	 if(! Pattern.matches("^[A-Z]{3,4}$",sec)) isValid = false;
