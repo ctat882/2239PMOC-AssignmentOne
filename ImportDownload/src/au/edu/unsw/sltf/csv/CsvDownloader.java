@@ -10,31 +10,32 @@ import java.net.URL;
 public class CsvDownloader {
 	private URL address;
 	private String filename;
-	
-	
-	public CsvDownloader (URL address) {
+
+	public CsvDownloader(URL address) {
 		this.address = address;
 		this.filename = this.address.getFile();
-		// Sourced from http://runnable.com/Uu83dm5vSScIAACw/download-a-file-from-the-web-for-java-files-and-save
+		// Get the base part of the URL address;
+		this.filename = this.filename.substring(this.filename.lastIndexOf('/'), this.filename.length());
 		
 	}
-	
+	// Sourced from
+	// http://runnable.com/Uu83dm5vSScIAACw/download-a-file-from-the-web-for-java-files-and-save
 	public void downloadCsv() throws IOException {
 		InputStream in = new BufferedInputStream(this.address.openStream());
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] buf = new byte[1024];
 		int n = 0;
-		 while (-1!=(n=in.read(buf)))
-		 {
-		    out.write(buf, 0, n);
-		 }
-		 out.close();
-		 in.close();
-		 byte[] response = out.toByteArray();
-		 
-		 String dir = System.getProperty("java.io.tmpdir");
-		 FileOutputStream fos = new FileOutputStream(dir + "\\" + this.filename);
-		 fos.write(response);
-		 fos.close();
+		while (-1 != (n = in.read(buf))) {
+			out.write(buf, 0, n);
+		}
+		out.close();
+		in.close();
+		byte[] response = out.toByteArray();
+		String dir = System.getProperty("java.io.tmpdir");
+		// TODO delete the follow print statement
+//		System.out.println("FILENAME:" + this.filename);
+		FileOutputStream fos = new FileOutputStream(dir + "/" + this.filename);
+		fos.write(response);
+		fos.close();
 	}
 }

@@ -1,12 +1,12 @@
 /**
- * 
+ *
  */
 package au.edu.unsw.sltf.csv;
 
-import java.io.BufferedReader;  
-import java.io.FileNotFoundException;  
-import java.io.FileReader;  
-import java.io.IOException;  
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 /**
@@ -17,7 +17,6 @@ public class CsvReader {
 	private String file;
 	private BufferedReader br;
 	private String splitBy;
-	
 	private static final int SEC = 0;
 	private static final int DATE = 1;
 	private static final int TIME = 2;
@@ -29,8 +28,8 @@ public class CsvReader {
 	private static final int BIDSIZE = 8;
 	private static final int ASKPRICE = 9;
 	private static final int ASKSIZE = 10;
-	
-	public CsvReader (String filename) {
+
+	public CsvReader(String filename) {
 		this.file = filename;
 		try {
 			this.br = new BufferedReader(new FileReader(filename));
@@ -40,19 +39,17 @@ public class CsvReader {
 		}
 		this.splitBy = ",";
 	}
-	
-	public boolean initialiseReader () {
+
+	public boolean initialiseReader() {
 		String line = "";
 		boolean lineRead;
-		
 		try {
-			if((line = this.br.readLine()) != null) {
-				if ( Pattern.matches("^[#]RIC", line)) {
+			if ((line = this.br.readLine()) != null) {
+				if (Pattern.matches("^[#]RIC.*", line)) {
 					lineRead = true;
-				}
-				else lineRead = false;
-			}
-			else {
+				} else
+					lineRead = false;
+			} else {
 				this.br.close();
 				lineRead = false;
 			}
@@ -63,27 +60,32 @@ public class CsvReader {
 		}
 		return lineRead;
 	}
-	
-	public MarketData getMarketDataRow () {
+
+	public MarketData getMarketDataRow() {
 		String line = "";
 		MarketData row;
 		try {
-			if((line = this.br.readLine()) != null) {
-				String[] data = line.split(splitBy);
+			if ((line = this.br.readLine()) != null) {
+				String[] data = line.split(splitBy,-11);
+				if(data.length != 11) System.out.println("Error Data array size is " + data.length + ", LINE:" + line);
+//				System.out.println("LINE:" + line);
 				row = new MarketData();
-				row.setSec(data[SEC]);
-				row.setDate(data[DATE]);
-				row.setTime(data[TIME]);
-				row.setOffset(Integer.parseInt(data[OFFSET]));
-				row.setEventType(data[EVENT]);
-				row.setPrice(Double.parseDouble(data[PRICE]));
-				row.setVolume(Integer.parseInt(data[VOLUME]));
-				row.setBidPrice(Double.parseDouble(data[BIDPRICE]));
-				row.setBidSize(Integer.parseInt(data[BIDSIZE]));
-				row.setAskPrice(Double.parseDouble(data[ASKPRICE]));
-				row.setAskSize(Integer.parseInt(data[ASKSIZE]));				
-			}
-			else {
+				if(!data[SEC].isEmpty())row.setSec(data[SEC]);
+				if(!data[DATE].isEmpty())row.setDate(data[DATE]);
+				if(!data[TIME].isEmpty())row.setTime(data[TIME]);
+//				System.out.println("data[DATE]:" + data[DATE]);
+//				System.out.println("row.getDateString:" + row.getDateString());
+				
+				
+				if(!data[OFFSET].isEmpty())row.setOffset(data[OFFSET]);
+				if(!data[EVENT].isEmpty())row.setEventType(data[EVENT]);
+				if(!data[PRICE].isEmpty())row.setPrice(Double.parseDouble(data[PRICE]));
+				if(!data[VOLUME].isEmpty())row.setVolume(Integer.parseInt(data[VOLUME]));
+				if(!data[BIDPRICE].isEmpty())row.setBidPrice(Double.parseDouble(data[BIDPRICE]));
+				if(!data[BIDSIZE].isEmpty())row.setBidSize(Integer.parseInt(data[BIDSIZE]));
+				if(!data[ASKPRICE].isEmpty())row.setAskPrice(Double.parseDouble(data[ASKPRICE]));
+				if(!data[ASKSIZE].isEmpty())row.setAskSize(Integer.parseInt(data[ASKSIZE]));
+			} else {
 				row = null;
 				this.br.close();
 			}
@@ -92,8 +94,6 @@ public class CsvReader {
 			e.printStackTrace();
 			row = null;
 		}
-		
 		return row;
 	}
-	
 }
