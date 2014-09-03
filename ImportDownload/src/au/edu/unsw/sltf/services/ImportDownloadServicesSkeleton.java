@@ -55,7 +55,10 @@ public class ImportDownloadServicesSkeleton implements
 		 *  from the URL parameter */
 		String tmpFileDirectory = System.getProperty("java.io.tmpdir");
 		/** The temporary file path*/
-		String tmpFilePath = req.getDataSourceURL().substring(req.getDataSourceURL().lastIndexOf('/'), req.getDataSourceURL().length());
+		
+		String tmpFile = req.getDataSourceURL().substring(req.getDataSourceURL().lastIndexOf('/'), req.getDataSourceURL().length());
+		
+		String tmpFilePath = tmpFileDirectory + "/" + tmpFile;
 		/** Location of the filtered Market Data file */
 		String outputFileDirectory = System.getenv("CATALINA_HOME") + "/webapps/ROOT/";
 		/** The output file's base name - Randomly generated*/
@@ -74,14 +77,17 @@ public class ImportDownloadServicesSkeleton implements
 		}
 		if (! isValidDates(start,end)) throw (createFaultException ("Invalid Dates","program"));
 		
-		
+//		boolean test = false;
 		/* If input is validated, then download the file to the temp directory */
 		CsvDownloader dl = new CsvDownloader(dataSource,tmpFileDirectory);
 		try {
 			dl.downloadCsv();
+//			test = true;
 		} catch (IOException e) {
 			throw (createFaultException("Bad CSV","program"));
 		}
+		// TODO: DOWNLOAD CHECKED AND WORKED
+//		if(test)throw (createFaultException("Got past the download section","program"));
 		/* Read the newly downloaded file */
 		CsvReader reader = new CsvReader(tmpFilePath);
 		/* Read the first line of the csv file, should be the commented line */
