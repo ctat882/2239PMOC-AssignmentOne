@@ -6,20 +6,23 @@
  */
 package au.edu.unsw.sltf.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import au.edu.unsw.sltf.csv.CsvDownloader;
 import au.edu.unsw.sltf.csv.CsvReader;
 import au.edu.unsw.sltf.csv.CsvWriter;
 import au.edu.unsw.sltf.csv.MarketData;
+import au.edu.unsw.sltf.services.DownloadFileDocument.DownloadFile;
+import au.edu.unsw.sltf.services.DownloadFileResponseDocument.DownloadFileResponse;
 import au.edu.unsw.sltf.services.ImportDownloadFaultDocument.ImportDownloadFault;
 import au.edu.unsw.sltf.services.ImportMarketDataDocument.ImportMarketData;
 import au.edu.unsw.sltf.services.ImportMarketDataResponseDocument.ImportMarketDataResponse;
-import au.edu.unsw.sltf.services.impl.ImportDownloadFaultDocumentImpl;
 
 /**
  * ImportDownloadServicesSkeleton java skeleton for the axisService
@@ -36,84 +39,139 @@ public class ImportDownloadServicesSkeleton implements
 	public au.edu.unsw.sltf.services.ImportMarketDataResponseDocument importMarketData(
 			au.edu.unsw.sltf.services.ImportMarketDataDocument importMarketData0)
 			throws ImportDownloadFaultException {
-		// TODO : fill this with the necessary business logic
-		// throw new java.lang.UnsupportedOperationException("Please implement "
-		// + this.getClass().getName() + "#importMarketData");
-		// Extract data elements
+
+		/* Declare Variables and Extract importMarketData elements */
+		
 		ImportMarketData req = importMarketData0.getImportMarketData();
-		String sec = req.getSec();
-		if (! isValidSec(sec)) throw (createFaultException("Bad SEC","sec"));
+		/** The Security Code passed in from importMarketData */
+		String sec = req.getSec();;
+		/** The start date passed in from importMarketData */
 		Calendar start = req.getStartDate();
+		/** The end date passed in from importMarketData */
 		Calendar end = req.getEndDate();
-		String outputFile = System.getProperty("catalina.home") + "/"
-				+ "webapps/ROOT/"+ "output.csv";
+		/** The URL passed in from importMarketData */
+		URL dataSource;
+		/** Location of the temporary directory to store the downloaded csv file, retrieved
+		 *  from the URL parameter */
+		String tmpFileDirectory = System.getProperty("java.io.tmpdir");
+		/** The temporary file path*/
+		String tmpFilePath = req.getDataSourceURL().substring(req.getDataSourceURL().lastIndexOf('/'), req.getDataSourceURL().length());
+		/** Location of the filtered Market Data file */
+		String outputFileDirectory = System.getenv("CATALINA_HOME") + "/webapps/ROOT/";
+		/** The output file's base name - Randomly generated*/
+		String eventSetId = UUID.randomUUID().toString();
+		/** The output file's full file name*/		
+		String outputFilePath = outputFileDirectory + eventSetId + ".csv";
 		
-			URL dataSource;
-			try {
-				dataSource = new URL(req.getDataSourceURL());
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw (createFaultException("Incorrect URL","url"));
-			}
-			/* If input is validated, then download the file */
-			CsvDownloader dl = new CsvDownloader(dataSource);
-			try {
-				dl.downloadCsv();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				throw (createFaultException("Bad CSV","program"));
-			}
-			/* Read the newly downloaded file */
-			String filepath = System.getProperty("java.io.tmpdir") + "/"
-					+ dataSource.getFile();
-			CsvReader reader = new CsvReader(filepath);
-			/* Read the first line of the csv file, should be the commented line */
-			if (!reader.initialiseReader()) {
-				// TODO throw ImportDownloadFaultException program
-				throw (createFaultException("Bad CSV","program"));
-			}
-			/* Create output file */
-			CsvWriter writer;
-			try {
-				writer = new CsvWriter(outputFile);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw (createFaultException("Could Not Create output CSV","program"));
-			}
-			/* Iterate over the MarketData */
-			MarketData data = reader.getMarketDataRow();
-			while (data != null) {
-				if (isValidData(data, sec, start, end)) {
-					try {
-						writer.writeRow(data);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						throw (createFaultException("Could Not Write to CSV","program"));
-					}
+		/* Validate Input */
+		
+		if (! isValidSec(sec)) throw (createFaultException("Bad SEC","sec"));			
+		try {
+			dataSource = new URL(req.getDataSourceURL());
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw (createFaultException("Incorrect URL","url"));
+		}
+		if (! isValidDates(start,end)) throw (createFaultException ("Invalid Dates","program"));
+		
+		
+		/* If input is validated, then download the file to the temp directory */
+		CsvDownloader dl = new CsvDownloader(dataSource,tmpFileDirectory);
+		try {
+			dl.downloadCsv();
+		} catch (IOException e) {
+			throw (createFaultException("Bad CSV","program"));
+		}
+		/* Read the newly downloaded file */
+		CsvReader reader = new CsvReader(tmpFilePath);
+		/* Read the first line of the csv file, should be the commented line */
+		if (!reader.initialiseReader()) {
+			throw (createFaultException("Bad or Missing comment line in CSV ","program"));
+		}
+		/* Create output file */
+		CsvWriter writer;
+		try {
+			writer = new CsvWriter(outputFilePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw (createFaultException("Could not create output CSV","program"));
+		}
+		/* Iterate over the MarketData and filter results */
+		MarketData dataRow = reader.getMarketDataRow();
+		while (dataRow != null) {
+			/* Filter the current row */
+			if (isValidData(dataRow, sec, start, end)) {
+				try {
+					writer.writeRow(dataRow);
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw (createFaultException("Could Not Write to CSV","program"));
 				}
-				data = reader.getMarketDataRow();
 			}
-			try {
-				writer.closeFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
+			dataRow = reader.getMarketDataRow();
+		}
+		/* Close writer */
+		try {
+			writer.closeFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw (createFaultException("Could not close writer","program"));
+		}			
 			
-			
-		
+		/* Output eventSetId */
 		ImportMarketDataResponseDocument resDoc = ImportMarketDataResponseDocument.Factory
 				.newInstance();
+		
 		ImportMarketDataResponse res = resDoc.addNewImportMarketDataResponse();
 		// Give the output file path as the eventSetId
-		res.setEventSetId(outputFile);
+		res.setEventSetId(eventSetId);
 		// res.setReturn(returnStr);
 		return resDoc;
 	}
 	
+	
+	
+	/**
+	 * Auto generated method signature
+	 *
+	 * @param downloadFile2
+	 * @return downloadFileResponse3
+	 * @throws ImportDownloadFaultException
+	 */
+	public au.edu.unsw.sltf.services.DownloadFileResponseDocument downloadFile(
+			au.edu.unsw.sltf.services.DownloadFileDocument downloadFile2)
+			throws ImportDownloadFaultException {
+		
+		/* Declare Variables and Extract importMarketData elements */
+		DownloadFile dl = downloadFile2.getDownloadFile();
+		/** The eventSetId provided as the input parameter*/
+		String eventSetId = dl.getEventSetId();
+		/** The directory of the market data files produced by ImportMarketData */
+		String marketDataDir = System.getenv("CATALINA_HOME") + "/webapps/ROOT/";
+		/** The file path of the market data file corresponding to the eventSetId given */
+		String marketDataFilePath = marketDataDir + eventSetId + ".csv";
+		/** The URL address of the market data file */
+		String dataURL = "http://localhost:8080/" + eventSetId + ".csv";
+		
+		/* Validate Input */
+		if (! isValidEventSetId (marketDataFilePath)) {
+			throw (createFaultException("Bad Event Set ID, file does not exist","event"));
+		}
+		
+		/* Return the URL location of the market data file */
+		DownloadFileResponseDocument resDoc = DownloadFileResponseDocument.Factory.newInstance();
+		DownloadFileResponse res = resDoc.addNewDownloadFileResponse();
+		res.setDataURL(dataURL);
+		return resDoc;
+	}
+	
+	
+	public boolean isValidEventSetId (String filepath) {
+		boolean isValid = false;
+		File f = new File(filepath);
+		if(f.exists()) isValid = true;
+		return isValid;
+	}
 	
 	/**
 	 * Create ImportDownloadFaultException based on fault type and message.
@@ -140,20 +198,7 @@ public class ImportDownloadServicesSkeleton implements
 	
 	
 	
-	/**
-	 * Auto generated method signature
-	 *
-	 * @param downloadFile2
-	 * @return downloadFileResponse3
-	 * @throws ImportDownloadFaultException
-	 */
-	public au.edu.unsw.sltf.services.DownloadFileResponseDocument downloadFile(
-			au.edu.unsw.sltf.services.DownloadFileDocument downloadFile2)
-			throws ImportDownloadFaultException {
-		// TODO : fill this with the necessary business logic
-		throw new java.lang.UnsupportedOperationException("Please implement "
-				+ this.getClass().getName() + "#downloadFile");
-	}
+	
 
 	/**
 	 * Check that the MarketData row meets search criteria.

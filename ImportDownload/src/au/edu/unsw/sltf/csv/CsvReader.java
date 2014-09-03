@@ -32,7 +32,7 @@ public class CsvReader {
 	public CsvReader(String filename) {
 		this.file = filename;
 		try {
-			this.br = new BufferedReader(new FileReader(filename));
+			this.br = new BufferedReader(new FileReader(this.file));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -10,12 +10,14 @@ import java.net.URL;
 public class CsvDownloader {
 	private URL address;
 	private String filename;
+	private String destination;
 
-	public CsvDownloader(URL address) {
+	public CsvDownloader(URL address, String destination) {
 		this.address = address;
 		this.filename = this.address.getFile();
 		// Get the base part of the URL address;
 		this.filename = this.filename.substring(this.filename.lastIndexOf('/'), this.filename.length());
+		this.destination = destination;
 		
 	}
 	// Sourced from
@@ -31,10 +33,10 @@ public class CsvDownloader {
 		out.close();
 		in.close();
 		byte[] response = out.toByteArray();
-		String dir = System.getProperty("java.io.tmpdir");
+//		String dir = System.getProperty("java.io.tmpdir");
 		// TODO delete the follow print statement
 //		System.out.println("FILENAME:" + this.filename);
-		FileOutputStream fos = new FileOutputStream(dir + "/" + this.filename);
+		FileOutputStream fos = new FileOutputStream(this.destination + "/" + this.filename);
 		fos.write(response);
 		fos.close();
 	}
