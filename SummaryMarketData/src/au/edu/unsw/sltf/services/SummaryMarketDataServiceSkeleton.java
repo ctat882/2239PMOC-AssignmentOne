@@ -96,14 +96,11 @@ public class SummaryMarketDataServiceSkeleton implements
 				marketType = "Mixed";
 			}
 			
-			/* Check currency code */
+			/* Check and get the currency code */
 			if(! dataRow.getCurrencyType().contentEquals("AUD")) {
 				currencyCode = dataRow.getCurrencyType();
 			}
-			// TODO
-			// going to have to iteratively check for price prefix, could be in any column
-			// currencyCode = someStringPrefixExtractingFunction on dataRow.getPrice();
-			
+			/* Store the last seen dataRow in the tmp variable */
 			tmpData = dataRow;
 			dataRow = reader.getMarketDataRow();
 		}
@@ -124,7 +121,7 @@ public class SummaryMarketDataServiceSkeleton implements
 		/* Get File size */
 		fileSize = reader.getFileSize();
 		
-		
+		/* Create Return Document */
 		SummaryMarketDataResponseDocument resDoc = SummaryMarketDataResponseDocument.Factory.newInstance();
 		SummaryMarketDataResponse res = resDoc.addNewSummaryMarketDataResponse();
 		/* Set return parameters */

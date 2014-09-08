@@ -253,7 +253,7 @@ public class MarketData {
 				this.time.get(Calendar.HOUR_OF_DAY),
 				this.time.get(Calendar.MINUTE),
 				this.time.get(Calendar.SECOND));
-		this.timeStamp.set(Calendar.MILLISECOND, time.get(Calendar.MILLISECOND));
+		this.timeStamp.set(Calendar.MILLISECOND, this.time.get(Calendar.MILLISECOND));
 	}
 	
 	
