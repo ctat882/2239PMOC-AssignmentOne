@@ -173,7 +173,7 @@ public class MarketData {
 	public void setPrice(String price) {
 		this.price = price;
 		if (Pattern.matches("^[A-Z]+[0-9]+[.]?[0-9]*$", price)) {
-			this.setCurrencyType(price.substring(0, 2));
+			this.setCurrencyType(price.substring(0, 3));
 			this.setActualPrice(Double.parseDouble(price.substring(3, price.length())));
 		}
 		else {

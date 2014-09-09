@@ -9,6 +9,9 @@ package au.edu.unsw.sltf.services;
 import java.io.File;
 import java.util.Calendar;
 
+import org.apache.xmlbeans.XmlCalendar;
+import org.apache.xmlbeans.XmlDateTime;
+
 import au.edu.unsw.sltf.csv.CsvReader;
 import au.edu.unsw.sltf.csv.MarketData;
 import au.edu.unsw.sltf.services.SummaryMarketDataDocument.SummaryMarketData;
@@ -128,10 +131,36 @@ public class SummaryMarketDataServiceSkeleton implements
 		res.setCurrencyCode(currencyCode);
 		res.setFileSize(fileSize);
 		res.setSec(sec);
-		res.setStartDate(start);
-		res.setEndDate(end);
+//		res.setStartDate(start);
+//		res.setEndDate(end);
 		res.setMarketType(marketType);
 		res.setEventSetId(eventSetId);
+		
+		XmlDateTime xmlDateEnd = XmlDateTime.Factory.newInstance();
+		Calendar xmlCalEnd = new XmlCalendar();
+		xmlCalEnd.set(end.get(Calendar.YEAR),
+				end.get(Calendar.MONTH),
+				end.get(Calendar.DAY_OF_MONTH),
+				end.get(Calendar.HOUR_OF_DAY),
+				end.get(Calendar.MINUTE),
+				end.get(Calendar.SECOND));
+		xmlCalEnd.set(Calendar.MILLISECOND, end.get(Calendar.MILLISECOND));
+		xmlDateEnd.setCalendarValue(xmlCalEnd);
+		res.xsetEndDate(xmlDateEnd);
+		
+		XmlDateTime xmlDateStart = XmlDateTime.Factory.newInstance();
+		Calendar xmlCalStart = new XmlCalendar();
+		xmlCalStart.set(start.get(Calendar.YEAR),
+				start.get(Calendar.MONTH),
+				start.get(Calendar.DAY_OF_MONTH),
+				start.get(Calendar.HOUR_OF_DAY),
+				start.get(Calendar.MINUTE),
+				start.get(Calendar.SECOND));
+		xmlCalStart.set(Calendar.MILLISECOND, start.get(Calendar.MILLISECOND));
+		xmlDateStart.setCalendarValue(xmlCalStart);
+		res.xsetStartDate(xmlDateStart);
+		
+		
 		
 		return resDoc;
 	}
