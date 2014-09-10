@@ -40,6 +40,10 @@ public class ImportDownloadServicesSkeleton implements
 			throws ImportDownloadFaultException {
 		/* Declare Variables and Extract importMarketData elements */
 		ImportMarketData req = importMarketData0.getImportMarketData();
+		/* Check for Null values */
+		if(req.getSec().isEmpty()) throw (createFaultException("Missing Security Code", "sec"));
+		if(req.getDataSourceURL().isEmpty()) throw (createFaultException("Missing URL", "url"));
+		
 		/** The Security Code passed in from importMarketData */
 		String sec = req.getSec();
 		;
@@ -149,6 +153,11 @@ public class ImportDownloadServicesSkeleton implements
 			throws ImportDownloadFaultException {
 		/* Declare Variables and Extract importMarketData elements */
 		DownloadFile dl = downloadFile2.getDownloadFile();
+		
+		if (dl.getEventSetId().isEmpty()) {
+			throw (createFaultException(
+					"Missing Event Set ID", "event"));
+		}
 		/** The eventSetId provided as the input parameter */
 		String eventSetId = dl.getEventSetId();
 		/** The directory of the market data files produced by ImportMarketData */

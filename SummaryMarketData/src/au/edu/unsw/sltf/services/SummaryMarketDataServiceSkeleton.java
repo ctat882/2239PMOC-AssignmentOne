@@ -38,6 +38,7 @@ public class SummaryMarketDataServiceSkeleton implements
 		
 		/* Declare Variables and Extract importMarketData elements */
 		SummaryMarketData marketDataDoc = summaryMarketData0.getSummaryMarketData();
+		if(marketDataDoc.getEventSetId().isEmpty()) throw (createFaultException("Missing Event Set ID", "event"));
 		/** The eventSetId provided as the input parameter */
 		String eventSetId = marketDataDoc.getEventSetId();
 		/** The directory of the market data files produced by ImportMarketData */

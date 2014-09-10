@@ -40,7 +40,8 @@ public class CurrencyConvertMarketDataSkeleton implements
 		
 		/* Declare Variables and Extract currencyConvertMarketData elements */
 		CurrencyConvertMarketData marketDataDoc = currencyConvertMarketData0.getCurrencyConvertMarketData();
-		
+		if(marketDataDoc.getEventSetId().isEmpty()) throw (createFaultException("Missing Event Set ID", "event"));
+		if(marketDataDoc.getTargetCurrency().isEmpty()) throw (createFaultException("Missing Target Currency", "currency"));
 		/** The eventSetId provided as an input parameter */
 		String eventSetId = marketDataDoc.getEventSetId();
 		/** The targetCurrency value provided as an input parameter*/
