@@ -46,7 +46,6 @@ public class ImportDownloadServicesSkeleton implements
 		
 		/** The Security Code passed in from importMarketData */
 		String sec = req.getSec();
-		;
 		/** The start date passed in from importMarketData */
 		Calendar start = req.getStartDate();
 		/** The end date passed in from importMarketData */
@@ -72,7 +71,7 @@ public class ImportDownloadServicesSkeleton implements
 		String outputFilePath = outputFileDirectory + eventSetId + ".csv";
 		/* Validate Input */
 		if (!isValidSec(sec))
-			throw (createFaultException("Bad SEC", "sec"));
+			throw (createFaultException("Invalid Security Code (SEC). Code must be 3-4 letters", "sec"));
 		try {
 			dataSource = new URL(req.getDataSourceURL());
 		} catch (MalformedURLException e) {
@@ -88,7 +87,7 @@ public class ImportDownloadServicesSkeleton implements
 			dl.downloadCsv();
 			// test = true;
 		} catch (IOException e) {
-			throw (createFaultException("Bad CSV", "program"));
+			throw (createFaultException("Error downloading the dataSource CSV file", "program"));
 		}
 		// TODO: DOWNLOAD CHECKED AND WORKED
 		// if(test)throw
