@@ -39,19 +39,19 @@ public class CsvWriter {
 		if (!data.getEventType().isEmpty())
 			s.append(data.getEventType());
 		s.append(',');
-		if (!(data.getPrice() == null))
+		if (!(data.getPrice().isEmpty()))
 			s.append(data.getPrice());
 		s.append(',');
 		if (!(data.getVolume() == null))
 			s.append(data.getVolume());
 		s.append(',');
-		if (!(data.getBidPrice() == null))
+		if (!(data.getBidPrice().isEmpty()))
 			s.append(data.getBidPrice());
 		s.append(',');
 		if (!(data.getBidSize() == null))
 			s.append(data.getBidSize());
 		s.append(',');
-		if (!(data.getAskPrice() == null))
+		if (!(data.getAskPrice().isEmpty()))
 			s.append(data.getAskPrice());
 		s.append(',');
 		if (!(data.getAskSize() == null))

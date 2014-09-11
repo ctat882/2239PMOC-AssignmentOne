@@ -93,11 +93,11 @@ public class CsvReader {
 				if (!data[VOLUME].isEmpty())
 					row.setVolume(Integer.parseInt(data[VOLUME]));
 				if (!data[BIDPRICE].isEmpty())
-					row.setBidPrice(Double.parseDouble(data[BIDPRICE]));
+					row.setBidPrice(data[BIDPRICE]);
 				if (!data[BIDSIZE].isEmpty())
 					row.setBidSize(Integer.parseInt(data[BIDSIZE]));
 				if (!data[ASKPRICE].isEmpty())
-					row.setAskPrice(Double.parseDouble(data[ASKPRICE]));
+					row.setAskPrice(data[ASKPRICE]);
 				if (!data[ASKSIZE].isEmpty())
 					row.setAskSize(Integer.parseInt(data[ASKSIZE]));
 				row.setTimeStamp();
@@ -111,6 +111,14 @@ public class CsvReader {
 			row = null;
 		}
 		return row;
+	}
+	
+	public void closeReader() {
+		try {
+			this.br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public String getFileSize () {

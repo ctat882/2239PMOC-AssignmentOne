@@ -37,11 +37,11 @@ public class MarketData {
 	/** Volume. An integer indicating the volume (e.g. of a trade). */
 	private Integer volume;
 	/** Bid Price. A decimal number that represents a bid price. */
-	private Double bidPrice;
+	private String bidPrice;
 	/** Bid Size. An integer that represents a bid size. */
 	private Integer bidSize;
 	/** Ask Price. A decimal number that represents an ask price. */
-	private Double askPrice;
+	private String askPrice;
 	/** Ask Size. An integer that represents an ask size. */
 	private Integer askSize;
 	/** The currency prefix of the price field , default to AUD */
@@ -59,9 +59,9 @@ public class MarketData {
 		this.eventType = "";
 		this.price = "";
 		this.volume = null;
-		this.bidPrice = null;
+		this.bidPrice = "";
 		this.bidSize = null;
-		this.askPrice = null;
+		this.askPrice = "";
 		this.askSize = null;
 		this.currencyType = "AUD";
 		this.actualPrice = null;
@@ -69,8 +69,8 @@ public class MarketData {
 	}
 
 	public MarketData(String sec, Calendar date, Calendar time, String offset,
-			String eventType, String price, int volume, double bidPrice,
-			int bidSize, double askPrice, int askSize) {
+			String eventType, String price, int volume, String bidPrice,
+			int bidSize, String askPrice, int askSize) {
 		super();
 		this.sec = sec;
 		this.date = date;
@@ -192,11 +192,11 @@ public class MarketData {
 		this.volume = volume;
 	}
 
-	public Double getBidPrice() {
+	public String getBidPrice() {
 		return bidPrice;
 	}
 
-	public void setBidPrice(double bidPrice) {
+	public void setBidPrice(String bidPrice) {
 		this.bidPrice = bidPrice;
 	}
 
@@ -208,11 +208,11 @@ public class MarketData {
 		this.bidSize = bidSize;
 	}
 
-	public Double getAskPrice() {
+	public String getAskPrice() {
 		return askPrice;
 	}
 
-	public void setAskPrice(double askPrice) {
+	public void setAskPrice(String askPrice) {
 		this.askPrice = askPrice;
 	}
 

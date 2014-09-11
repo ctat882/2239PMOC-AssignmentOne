@@ -37,11 +37,13 @@ public class MarketData {
 	/** Volume. An integer indicating the volume (e.g. of a trade). */
 	private Integer volume;
 	/** Bid Price. A decimal number that represents a bid price. */
-	private Double bidPrice;
+	private String bidPrice;
+	private Double actualBidPrice;
 	/** Bid Size. An integer that represents a bid size. */
 	private Integer bidSize;
 	/** Ask Price. A decimal number that represents an ask price. */
-	private Double askPrice;
+	private String askPrice;
+	private Double actualAskPrice;
 	/** Ask Size. An integer that represents an ask size. */
 	private Integer askSize;
 	/** The currency prefix of the price field , default to AUD */
@@ -59,9 +61,11 @@ public class MarketData {
 		this.eventType = "";
 		this.price = "";
 		this.volume = null;
-		this.bidPrice = null;
+		this.bidPrice = "";
+		this.actualBidPrice = null;
 		this.bidSize = null;
-		this.askPrice = null;
+		this.askPrice = "";
+		this.actualAskPrice = null;
 		this.askSize = null;
 		this.currencyType = "AUD";
 		this.actualPrice = null;
@@ -69,8 +73,8 @@ public class MarketData {
 	}
 
 	public MarketData(String sec, Calendar date, Calendar time, String offset,
-			String eventType, String price, int volume, double bidPrice,
-			int bidSize, double askPrice, int askSize) {
+			String eventType, String price, int volume, String bidPrice,
+			int bidSize, String askPrice, int askSize) {
 		super();
 		this.sec = sec;
 		this.date = date;
@@ -192,12 +196,29 @@ public class MarketData {
 		this.volume = volume;
 	}
 
-	public Double getBidPrice() {
+	public String getBidPrice() {
 		return bidPrice;
 	}
 
-	public void setBidPrice(double bidPrice) {
+	public void setBidPrice(String bidPrice) {
 		this.bidPrice = bidPrice;
+		
+		
+		if (Pattern.matches("^[A-Z]+[0-9]+[.]?[0-9]*$", bidPrice)) {
+			this.setCurrencyType(bidPrice.substring(0, 3));
+			this.setActualBidPrice(Double.parseDouble(bidPrice.substring(3, bidPrice.length())));
+		}
+		else {
+			this.setActualBidPrice(Double.parseDouble(bidPrice));
+		}
+	}
+	
+	public Double getActualBidPrice () {
+		return this.actualBidPrice;
+	}
+	
+	public void setActualBidPrice(Double actualBidPrice) {
+		this.actualBidPrice = actualBidPrice;
 	}
 
 	public Integer getBidSize() {
@@ -208,12 +229,27 @@ public class MarketData {
 		this.bidSize = bidSize;
 	}
 
-	public Double getAskPrice() {
+	public String getAskPrice() {
 		return askPrice;
 	}
 
-	public void setAskPrice(double askPrice) {
+	public void setAskPrice(String askPrice) {
 		this.askPrice = askPrice;
+		if (Pattern.matches("^[A-Z]+[0-9]+[.]?[0-9]*$", askPrice)) {
+			this.setCurrencyType(askPrice.substring(0, 3));
+			this.setActualAskPrice(Double.parseDouble(askPrice.substring(3, askPrice.length())));
+		}
+		else {
+			this.setActualAskPrice(Double.parseDouble(askPrice));
+		}
+	}
+	
+	public Double getActualAskPrice () {
+		return this.actualAskPrice;
+	}
+	
+	public void setActualAskPrice(Double actualAskPrice) {
+		this.actualAskPrice = actualAskPrice;
 	}
 
 	public Integer getAskSize() {

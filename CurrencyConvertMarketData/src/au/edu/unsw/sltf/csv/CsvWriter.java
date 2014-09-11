@@ -39,23 +39,31 @@ public class CsvWriter {
 		if (!data.getEventType().isEmpty())
 			s.append(data.getEventType());
 		s.append(',');
-		if (!data.getCurrencyType().contentEquals("AUD")) {
+		if (!data.getCurrencyType().contentEquals("AUD") && !data.getPrice().isEmpty()) {
 			s.append(data.getCurrencyType());
 		}
 		if (!(data.getActualPrice() == null))
 			s.append(data.getActualPrice());
 		s.append(',');
+		
+		
 		if (!(data.getVolume() == null))
 			s.append(data.getVolume());
 		s.append(',');
-		if (!(data.getBidPrice() == null))
-			s.append(data.getBidPrice());
+		if (!data.getCurrencyType().contentEquals("AUD") && !data.getBidPrice().isEmpty()) {
+			s.append(data.getCurrencyType());
+		}
+		if (!(data.getActualBidPrice() == null))
+			s.append(data.getActualBidPrice());
 		s.append(',');
 		if (!(data.getBidSize() == null))
 			s.append(data.getBidSize());
 		s.append(',');
-		if (!(data.getAskPrice() == null))
-			s.append(data.getAskPrice());
+		if (!data.getCurrencyType().contentEquals("AUD") && !data.getAskPrice().isEmpty()) {
+			s.append(data.getCurrencyType());
+		}
+		if (!(data.getActualAskPrice() == null))
+			s.append(data.getActualAskPrice());
 		s.append(',');
 		if (!(data.getAskSize() == null))
 			s.append(data.getAskSize());

@@ -52,6 +52,22 @@ public class ImportDownloadServicesSkeleton implements
 		Calendar end = req.getEndDate();
 		/** The URL passed in from importMarketData */
 		URL dataSource;
+		
+		/* Validate Input */
+		if (!isValidSec(sec))
+			throw (createFaultException("Invalid Security Code (SEC). Code must be 3-4 letters", "sec"));
+		if(!isValidURL(req.getDataSourceURL()))
+			throw (createFaultException("Incorrect URL", "url"));
+		
+		try {
+			dataSource = new URL(req.getDataSourceURL());
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw (createFaultException("Incorrect URL", "url"));
+		}
+		if (!isValidDates(start, end))
+			throw (createFaultException("Invalid Dates", "program"));
+		
 		/**
 		 * Location of the temporary directory to store the downloaded csv file,
 		 * retrieved from the URL parameter
@@ -69,17 +85,7 @@ public class ImportDownloadServicesSkeleton implements
 		String eventSetId = UUID.randomUUID().toString();
 		/** The output file's full file name */
 		String outputFilePath = outputFileDirectory + eventSetId + ".csv";
-		/* Validate Input */
-		if (!isValidSec(sec))
-			throw (createFaultException("Invalid Security Code (SEC). Code must be 3-4 letters", "sec"));
-		try {
-			dataSource = new URL(req.getDataSourceURL());
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			throw (createFaultException("Incorrect URL", "url"));
-		}
-		if (!isValidDates(start, end))
-			throw (createFaultException("Invalid Dates", "program"));
+		
 		// boolean test = false;
 		/* If input is validated, then download the file to the temp directory */
 		CsvDownloader dl = new CsvDownloader(dataSource, tmpFileDirectory);
@@ -275,4 +281,14 @@ public class ImportDownloadServicesSkeleton implements
 			isValid = false;
 		return isValid;
 	}
+	
+	
+	
+	private boolean isValidURL(String url) {
+		boolean isValid = true;
+		if (!Pattern.matches("^http.*$", url))
+			isValid = false;
+		return isValid;
+	}
+	
 }

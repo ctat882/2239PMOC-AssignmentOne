@@ -131,9 +131,9 @@ public class CurrencyConvertMarketDataSkeleton implements
 		MarketData dataRow = reader.getMarketDataRow();
 		while (dataRow != null) {
 			/* Alter the price and currency type */
-			if(! dataRow.getPrice().isEmpty()) {
+//			if(! dataRow.getPrice().isEmpty()) {
 				dataRow.setCurrencyType(curData.getCode());
-				convertPrice(curData,dataRow);
+				convertPrices(curData,dataRow);
 				try {
 					writer.writeRow(dataRow);
 				} catch (IOException e) {
@@ -141,7 +141,7 @@ public class CurrencyConvertMarketDataSkeleton implements
 					throw (createFaultException("Could Not Write to CSV",
 							"program"));
 				}
-			}
+//			}
 			dataRow = reader.getMarketDataRow();
 		}
 		/* Close writer */
@@ -155,16 +155,29 @@ public class CurrencyConvertMarketDataSkeleton implements
 		return newEventSetId;
 	}
 	
-	public void convertPrice (CurrencyData curData, MarketData dataRow) {
-		Double price = dataRow.getActualPrice();
-		price = price * curData.getUnitsPerAUD();
+	public void convertPrices(CurrencyData curData, MarketData dataRow) {
 		
+		//TODO FIX THIS
+		if(!dataRow.getPrice().isEmpty()) {
+			dataRow.setActualPrice(getFormatedDouble(dataRow.getActualPrice(),curData.getUnitsPerAUD()));
+		}
+		if(!dataRow.getAskPrice().isEmpty()) {
+			dataRow.setActualAskPrice(getFormatedDouble(dataRow.getActualAskPrice(),curData.getUnitsPerAUD()));
+		}
+		if(!dataRow.getBidPrice().isEmpty()) {
+			dataRow.setActualBidPrice(getFormatedDouble(dataRow.getActualBidPrice(),curData.getUnitsPerAUD()));
+		}
+		
+	}
+	
+	private double getFormatedDouble (double toConvert, double rate) {
+		double price = toConvert * rate;
 		long factor = (long)Math.pow(10, 2);
 		double val = price * factor;
 		long tmp = Math.round(val);
 		price =(double) tmp / factor;
+		return price;
 		
-		dataRow.setActualPrice(price);
 	}
 	
 	public boolean alreadyConverted (String marketDataFilePath) throws CurrencyConvertMarketDataFaultException {
