@@ -1,0 +1,91 @@
+body{
+	
+	font-family: Verdana, Arial, sans-serif;
+	width: 900px;
+	margin-left: auto;
+    margin-right: auto;
+    border: 1px solid;
+    padding: 20px;
+    
+}
+
+td{
+	
+	padding-left: 20px;
+}
+
+h1 {
+	text-align:center;
+	font-family: Verdana, Arial, sans-serif;
+}
+
+table {
+
+	margin-left:auto; 
+    margin-right:auto;
+
+}
+
+h2 {
+	text-align:center;
+}
+
+h3 {
+	text-align:center;
+}
+
+.buttonHolder{ 
+	text-align: center; 
+
+}
+
+p {
+	text-align: center; 
+	
+}
+
+.textParagraph {	
+	margin-left: auto;
+    margin-right: auto;
+}
+
+
+ 
+
+
+
+
+
+
+/* Begin Navigation Bar Styling */
+#nav {
+  border: 1px solid;	
+  width: auto;
+  float: left;
+  margin-left:60px;
+
+  padding:0;
+  list-style: none;
+  background-color: #f2f2f2;
+   }
+  #nav li {float: left;
+  }
+  #nav li a {
+  display: block;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: #069;
+  border-right: 1px solid #ccc; }
+  #nav li a:hover {
+  color: #c00;
+  background-color: #fff; }
+  /* End navigation bar styling. */
+
+  /* This is just styling for this specific page. */
+  #wrap {
+  margin-left: auto;
+  margin-right: auto;
+  
+  background-color: #fff;
+   } 
+
